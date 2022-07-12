@@ -168,6 +168,15 @@ int main(int argc, char *argv[])
     EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, A2_Mode);
     EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
 #endif
+#if(USE_Normal)
+
+    //Show a bmp file
+    //1bp use A2 mode by default, before used it, refresh the screen with WHITE
+    Display_BMP(Panel_Width, Panel_Height, Init_Target_Memory_Addr, BitsPerPixel_1);
+    
+    EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
+   
+#endif
 
 
 #if(USE_Touch_Panel)
