@@ -11,7 +11,9 @@
 
 #define USE_Factory_Test false
 
-#define USE_Normal_Demo true
+#define USE_Normal_Demo false
+
+#define USE_Normal true
 
 #define USE_Touch_Panel false
 
