@@ -27,7 +27,8 @@ int epd_mode = 0;	//0: no rotate, no mirror
 					//1: no rotate, horizontal mirror, for 10.3inch
 					//2: no totate, horizontal mirror, for 5.17inch
 					//3: no rotate, no mirror, isColor, for 6inch color
-					
+int xPos =0;
+int yPos=0;
 void  Handler(int signo){
     Debug("\r\nHandler:exit\r\n");
     if(Refresh_Frame_Buf != NULL){
@@ -72,7 +73,7 @@ int main(int argc, char *argv[])
         Debug("Example: sudo ./epd -2.51\r\n");
         exit(1);
     }
-	if (argc != 3){
+	if (argc != 5){
 		Debug("Please input e-Paper display mode!\r\n");
 		Debug("Example: sudo ./epd -2.51 0 or sudo ./epd -2.51 1\r\n");
 		Debug("Now, 10.3 inch glass panle is mode1, else is mode0\r\n");
@@ -92,6 +93,11 @@ int main(int argc, char *argv[])
 	sscanf(argv[2],"%d",&epd_mode);
     Debug("Display mode:%d\r\n", epd_mode);
     Dev_Info = EPD_IT8951_Init(VCOM);
+
+    sscanf(argv[3],"%d",&xPos);
+    Debug("xPos:%d\r\n",xPos);
+    sscanf(argv[4],"%d",&yPos);
+    Debug("yPos:%d\r\n",yPos);
 
 #if(Enhance)
     Debug("Attention! Enhanced driving ability, only used when the screen is blurred\r\n");
@@ -126,13 +132,15 @@ int main(int argc, char *argv[])
     }
     Debug("A2 Mode:%d\r\n", A2_Mode);
 
-	EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
+	//EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
 
 #if(USE_Factory_Test)
+
 	if(epd_mode == 3) 	// Color Test
 		Color_Test(Dev_Info, Init_Target_Memory_Addr);
     else				// Normal Test
 		Factory_Test_Only(Dev_Info, Init_Target_Memory_Addr);
+    
 #endif
 
 
@@ -170,14 +178,28 @@ int main(int argc, char *argv[])
     EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, A2_Mode);
     EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
 #endif
-#if(USE_Normal)
 
+#if(USE_Normal)
+int counters=0;
+while (1){
+  //  EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
+  // EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, A2_Mode);
     //Show a bmp file
     //1bp use A2 mode by default, before used it, refresh the screen with WHITE
-    Display_BMP(Panel_Width, Panel_Height, Init_Target_Memory_Addr, BitsPerPixel_1);
-    
-    EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
+     counters =counters+1;
+    Debug("running display :%d\r\n",counters);
+    Dynamic_GIF(Panel_Width, Panel_Height, Init_Target_Memory_Addr);
+    Paint_DrawRectangle(50, 50, Panel_Width/2, Panel_Height/2, 0x30, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
+    Paint_DrawCircle(Panel_Width*3/4, Panel/4, 100, 0xF0, DOT_PIXEL_2X2, DRAW_FILL_EMPTY);
+    Paint_DrawNum(Panel_Width/4, Panel_Height/5, 709, &Font20, 0x30, 0xB0);
+    //Display_BMP(Panel_Width, Panel_Height, Init_Target_Memory_Addr, BitsPerPixel_4);
+    // Dynamic_Refresh(Dev_Info,Init_Target_Memory_Addr);
+    // EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, A2_Mode);
+    //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
+    break;
+    DEV_Delay_ms(50);
    
+   }
 #endif
 
 
@@ -188,14 +210,16 @@ int main(int argc, char *argv[])
 #endif
 
     //We recommended refresh the panel to white color before storing in the warehouse.
-    EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
+    //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
 
     //EPD_IT8951_Standby();
-    EPD_IT8951_Sleep();
-
+    //EPD_IT8951_Sleep();
+    //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, A2_Mode);
+    //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
     //In case RPI is transmitting image in no hold mode, which requires at most 10s
-    DEV_Delay_ms(5000);
+    //DEV_Delay_ms(50);
 
-    DEV_Module_Exit();
+    //DEV_Module_Exit();
+
     return 0;
 }
